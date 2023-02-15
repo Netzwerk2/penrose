@@ -231,6 +231,8 @@
 <a href="#230" id="230">230</a>
 <a href="#231" id="231">231</a>
 <a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
 </pre><pre class="rust"><code><span class="doccomment">//! A simple wrapper for suckless&#39; [dmenu][1] tool for providing quick text based menus
 //!
 //! [1]: https://tools.suckless.org/dmenu/
@@ -313,7 +315,7 @@
 }
 
 <span class="kw">impl </span>DMenuConfig {
-    <span class="kw">fn </span>flags(<span class="kw-2">&amp;</span><span class="self">self</span>, prompt: <span class="kw-2">&amp;</span>str, screen_index: usize) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>flags(<span class="kw-2">&amp;</span><span class="self">self</span>, prompt: <span class="kw-2">&amp;</span>str, screen_index: usize) -&gt; <span class="kw">impl </span>Iterator&lt;Item = String&gt; + <span class="lifetime">&#39;_ </span>{
         <span class="kw">let </span><span class="kw-2">&amp;</span>DMenuConfig {
             password_input,
             ignore_case,
@@ -324,32 +326,34 @@
             ..
         } = <span class="self">self</span>;
 
-        <span class="kw">let </span><span class="kw-2">mut </span>s = <span class="macro">format!</span>(
-            <span class="string">&quot;-nb {} -nf {} -sb {} -m {}&quot;</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>flags = <span class="macro">vec!</span>[
+            <span class="string">&quot;-nb&quot;</span>.to_string(),
             bg_color.as_rgb_hex_string(),
+            <span class="string">&quot;-nf&quot;</span>.to_string(),
             fg_color.as_rgb_hex_string(),
+            <span class="string">&quot;-sb&quot;</span>.to_string(),
             selected_color.as_rgb_hex_string(),
-            screen_index,
-        );
+            <span class="string">&quot;-m&quot;</span>.to_string(),
+            screen_index.to_string(),
+        ];
 
         <span class="kw">if </span>n_lines &gt; <span class="number">0 </span>{
-            s.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot; -l {n_lines}&quot;</span>))
+            flags.extend_from_slice(<span class="kw-2">&amp;</span>[<span class="string">&quot;-l&quot;</span>.to_string(), n_lines.to_string()]);
         }
 
         <span class="kw">if </span>password_input {
-            s.push_str(<span class="string">&quot; -P&quot;</span>);
+            flags.extend_from_slice(<span class="kw-2">&amp;</span>[<span class="string">&quot;-P&quot;</span>.to_string()]);
         }
 
         <span class="kw">if </span>ignore_case {
-            s.push_str(<span class="string">&quot; -i&quot;</span>);
+            flags.extend_from_slice(<span class="kw-2">&amp;</span>[<span class="string">&quot;-i&quot;</span>.to_string()]);
         }
 
         <span class="kw">if </span>!prompt.is_empty() {
-            s.push_str(<span class="string">&quot; -p &quot;</span>);
-            s.push_str(prompt);
+            flags.extend_from_slice(<span class="kw-2">&amp;</span>[<span class="string">&quot;-p&quot;</span>.to_string(), prompt.to_string()]);
         }
 
-        s.split_whitespace().map(|s| s.to_owned()).collect()
+        flags.into_iter()
     }
 }
 
