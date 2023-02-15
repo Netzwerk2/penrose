@@ -315,7 +315,7 @@
 }
 
 <span class="kw">impl </span>DMenuConfig {
-    <span class="kw">fn </span>flags(<span class="kw-2">&amp;</span><span class="self">self</span>, prompt: <span class="kw-2">&amp;</span>str, screen_index: usize) -&gt; <span class="kw">impl </span>Iterator&lt;Item = String&gt; + <span class="lifetime">&#39;_ </span>{
+    <span class="kw">fn </span>flags(<span class="kw-2">&amp;</span><span class="self">self</span>, prompt: <span class="kw-2">&amp;</span>str, screen_index: usize) -&gt; Vec&lt;String&gt; {
         <span class="kw">let </span><span class="kw-2">&amp;</span>DMenuConfig {
             password_input,
             ignore_case,
@@ -342,18 +342,18 @@
         }
 
         <span class="kw">if </span>password_input {
-            flags.extend_from_slice(<span class="kw-2">&amp;</span>[<span class="string">&quot;-P&quot;</span>.to_string()]);
+            flags.push(<span class="string">&quot;-P&quot;</span>.to_string());
         }
 
         <span class="kw">if </span>ignore_case {
-            flags.extend_from_slice(<span class="kw-2">&amp;</span>[<span class="string">&quot;-i&quot;</span>.to_string()]);
+            flags.push(<span class="string">&quot;-i&quot;</span>.to_string());
         }
 
         <span class="kw">if </span>!prompt.is_empty() {
             flags.extend_from_slice(<span class="kw-2">&amp;</span>[<span class="string">&quot;-p&quot;</span>.to_string(), prompt.to_string()]);
         }
 
-        flags.into_iter()
+        flags
     }
 }
 
